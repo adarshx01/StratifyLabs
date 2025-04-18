@@ -19,7 +19,8 @@
 
 # production
 /build
-
+/public/model
+public/model
 # misc
 .DS_Store
 *.pem
