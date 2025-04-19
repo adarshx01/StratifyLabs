@@ -1,6 +1,14 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-// import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { type Metadata } from 'next'
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 import Navbar from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Auth0Provider } from '@auth0/nextjs-auth0'
@@ -15,19 +23,17 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full">
-      <body className={`${inter.className} flex flex-col min-h-screen`}>
-        {/* <UserProvider> */}
-        <Auth0Provider>
-          <nav className="sticky top-0 z-50 bg-white shadow">
-            <Navbar />
-          </nav>
-          <main className="flex-grow">{children}</main>
-          <Footer />
-          </Auth0Provider>
-        {/* </UserProvider> */}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className="h-full">
+        <body className={`${inter.className} flex flex-col min-h-screen`}>
+            <nav className="sticky top-0 z-50 bg-white shadow">
+              <Navbar />
+            </nav>
+            <main className="flex-grow">{children}</main>
+            <Footer />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
 
