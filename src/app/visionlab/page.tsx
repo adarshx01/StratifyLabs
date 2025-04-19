@@ -1,4 +1,4 @@
-import { VRExperience } from "@/components/Experience";
+import { VRExperience } from "@/components/VisionLab/Experience";
 
 export default function Home() {
   return (

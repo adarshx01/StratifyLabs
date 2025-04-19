@@ -11,7 +11,6 @@ import { Teacher } from "./Teacher";
 import { TypingBox } from "./TypingBox";
 import { AIAssistant } from "./AIAssistant";
 import { Leva, button, useControls } from "leva";
-import { Scale } from 'lucide-react';
 import  SciFiCamera  from '@/components/TestCamera/page';
 
 const itemPlacement = {
@@ -86,7 +85,7 @@ const VRScene = () => {
         <SciFiCamera />
       </Html>
       <Environment preset="sunset" />
-      <ambientLight intensity={0.8} color="pink" />
+      <ambientLight intensity={1} color="pink" />
 
       {/* <Gltf
         src={`/models/classroom_${classroom}.glb`}
