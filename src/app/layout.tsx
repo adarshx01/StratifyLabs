@@ -11,7 +11,6 @@ import {
 } from '@clerk/nextjs'
 import Navbar from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
-import { Auth0Provider } from '@auth0/nextjs-auth0'
 
 const inter = Inter({ subsets: ['latin'] })
 

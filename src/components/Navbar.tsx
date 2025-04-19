@@ -14,11 +14,11 @@ import {
 
 const Navbar = () => {
   return (
-    <nav className='absolute z-[60] h-14 inset-x-0 top-0 w-full border-b border-gray-100 bg-white/25 backdrop-blur-lg transition-all'>
+    <nav className='absolute z-[60] h-14 inset-x-0 top-0 w-full bg-white/25 backdrop-blur-lg transition-all'>
       <MaxWidthWrapper>
-        <div className='flex h-14 items-center justify-between border-b border-zinc-200'>
+        <div className='flex h-14 items-center justify-between '>
           <Link href='/' className='flex z-40 font-semibold'>
-            VisionFlow
+            Stratify<span className="">Labs</span>
           </Link>
           <div className='h-full flex items-center space-x-4'>
             {/* show sign in / up when signed out */}
@@ -43,12 +43,12 @@ const Navbar = () => {
             <SignedIn>
               <UserButton />
 
-              {/* optional extra links */}
+              {/* replaced VisionLab with Inference */}
               <Link
-                href='/visionlab'
+                href='/inference'
                 className={buttonVariants({ size: "sm", variant: "ghost" })}
               >
-                VisionLab
+                Inference
               </Link>
               <Link
                 href='/train'
