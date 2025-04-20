@@ -297,7 +297,7 @@ export function AIAssistant() {
   }
 
   return (
-    <Card className="h-[600px] flex flex-col">
+    <Card className="h-[600px] flex flex-col bg-purple-200/20 border border-gray-300 shadow-lg rounded-lg">
       <CardContent className="flex-1 flex flex-col p-4">
         <div className="flex-1 overflow-y-auto space-y-4 mb-4">
           {messages.length === 0 ? (

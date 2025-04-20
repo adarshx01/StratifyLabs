@@ -77,7 +77,7 @@ const Navbar = () => {
                 href="/visionlab"
                 className={`${buttonVariants({ size: "sm", variant: "ghost" })} text-lg hover:bg-blue-100 hover:text-blue-500`}
               >
-                VisionLab
+                Inference
               </Link>
               <Link
                 href="/train"

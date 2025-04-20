@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { VRButton, XR, Controllers, Hands, useXR } from '@react-three/xr';
 import { CameraControls, Environment, Float, Gltf, Html, Loader, useGLTF } from "@react-three/drei";
 import { useAITeacher } from "@/hooks/useAITeacher";
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { degToRad } from "three/src/math/MathUtils";
 import { BoardSettings } from "./BoardSettings";
 import { MessagesList } from "./MessagesList";
@@ -12,6 +12,8 @@ import { TypingBox } from "./TypingBox";
 import { AIAssistant } from "./AIAssistant";
 import { Leva, button, useControls } from "leva";
 import  SciFiCamera  from '@/components/TestCamera/page';
+import { URDFModel } from "./URDFModel";
+import { URDFControl, useURDFStore } from "./URDFControl";
 
 const itemPlacement = {
   default: {
@@ -20,7 +22,12 @@ const itemPlacement = {
       scale: 0.02,
     },
     teacher: {
-      position: [-1, -1.6, -3],
+      position: [-1, -1.6, -3]
+    },
+    urdfModel: {
+      position: [-1, -0.5, -3],
+      rotation: [degToRad(-90), degToRad(0), degToRad(-75)], 
+      scale: 1.5,
     },
     board: {
       position: [0.2, 0.382, -6.5],
@@ -42,7 +49,7 @@ const itemPlacement = {
       scale: 1.3,
     },
     teacher: { position: [-0.4, -1.6, -3] },
-    board: { position: [-6, 0.84, -2],rotation: [0, Math.PI / 2, 0] },
+    board: { position: [-6, 0.84, -2], rotation: [0, Math.PI / 2, 0] },
     aiAssistant: {
       position: [2, 0.7, -7],
       rotation: [0, -Math.PI / 4, 0],
@@ -50,6 +57,11 @@ const itemPlacement = {
     scifiCamera: {
       position: [2, 0.3, -1.1],
       rotation: [0, -Math.PI / 4.23,0],
+    },
+    urdfModel: {
+      position: [-0.4, -1.6, -3], // Exactly same as teacher position
+      rotation: [0, degToRad(20), 0], // Same rotation as teacher
+      scale: 1.5, // Match teacher scale
     }
   }
 };
@@ -59,6 +71,9 @@ const VRScene = () => {
   const teacher = useAITeacher((state) => state.teacher);
   const classroom = useAITeacher((state) => state.classroom);
   const { isPresenting } = useXR();
+  
+  const urdfContent = useURDFStore((state) => state.urdfContent);
+  const showModel = useURDFStore((state) => state.showModel);
 
   return (
     <Float speed={0.5} floatIntensity={0.2} rotationIntensity={0.1}>
@@ -87,21 +102,26 @@ const VRScene = () => {
       <Environment preset="sunset" />
       <ambientLight intensity={1} color="pink" />
 
-      {/* <Gltf
-        src={`/models/classroom_${classroom}.glb`}
-        {...itemPlacement[classroom].classroom}
-      /> */}
       <Gltf
         src={`/models/scifi_room_${classroom}.glb`}
         {...itemPlacement[classroom].classroom}
       />
-      <Teacher
-        teacher={teacher}
-        key={teacher}
-        {...itemPlacement[classroom].teacher}
-        scale={1.5}
-        rotation-y={degToRad(20)}
-      />
+      
+      {/* Conditionally render either the Teacher or the URDF model */}
+      {showModel ? (
+        <URDFModel 
+          urdfContent={urdfContent} 
+          {...itemPlacement[classroom].urdfModel} 
+        />
+      ) : (
+        <Teacher
+          teacher={teacher}
+          key={teacher}
+          {...itemPlacement[classroom].teacher}
+          scale={1.5}
+          rotation-y={degToRad(20)}
+        />
+      )}
       
       {/* VR-specific components */}
       {isPresenting && (
@@ -189,6 +209,7 @@ export const VRExperience = () => {
       <VRButton className="fixed bottom-4 right-4 z-50" />
       <div className="z-10 md:justify-center fixed bottom-4 left-4 right-4 flex gap-3 flex-wrap justify-stretch">
         <TypingBox />
+        <URDFControl />
       </div>
       <Leva hidden />
       <Loader />
