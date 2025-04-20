@@ -1,15 +1,41 @@
-"use client"
+"use client";
 
-import { motion } from "motion/react"
-import { Pacifico } from "next/font/google"
-import Image from "next/image"
-import { cn } from "@/lib/utils"
+import { motion } from "motion/react";
+import { Pacifico } from "next/font/google";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { SignUpButton } from "@clerk/nextjs";
+import { ArrowRight } from "lucide-react"; // Importing the ArrowRight icon from lucide-react
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const pacifico = Pacifico({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-pacifico",
-})
+});
+
+// Define the GIF data
+const gifs = [
+  {
+    id: 1,
+    title: "Classification",
+    description: "Identifying what objects are in an image",
+    src: "/images/heroGifs/classification_gif.gif",
+  },
+  {
+    id: 2,
+    title: "Segmentation",
+    description: "Dividing an image into segments or regions",
+    src: "/images/heroGifs/segmentation_gif.gif",
+  },
+  {
+    id: 3,
+    title: "Detection",
+    description: "Locating objects within an image",
+    src: "/images/heroGifs/detection_gif.gif",
+  },
+];
 
 function ElegantShape({
   className,
@@ -19,12 +45,12 @@ function ElegantShape({
   rotate = 0,
   gradient = "from-white/[0.08]",
 }: {
-  className?: string
-  delay?: number
-  width?: number
-  height?: number
-  rotate?: number
-  gradient?: string
+  className?: string;
+  delay?: number;
+  width?: number;
+  height?: number;
+  rotate?: number;
+  gradient?: string;
 }) {
   return (
     <motion.div
@@ -69,22 +95,93 @@ function ElegantShape({
             "backdrop-blur-[2px] border-2 border-white/[0.15]",
             "shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]",
             "after:absolute after:inset-0 after:rounded-full",
-            "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]",
+            "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]"
           )}
         />
       </motion.div>
     </motion.div>
-  )
+  );
+}
+
+function GifCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Auto-advance the carousel every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % gifs.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Handle manual navigation
+  const goToGif = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  return (
+    <div className="w-full max-w-2xl mx-auto px-4">
+      <Card className="overflow-hidden bg-darkblue-500/[0.2] border border-white/[0.1] shadow-lg rounded-lg">
+        <CardContent className="p-0">
+          <div className="relative h-[300px] w-full">
+            {gifs.map((gif, index) => (
+              <div
+                key={gif.id}
+                className={cn(
+                  "absolute inset-0 transition-opacity duration-500",
+                  index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                )}
+              >
+                <img
+                  src={gif.src || "/placeholder.svg"}
+                  alt={gif.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Indicator box */}
+      <div className="mt-4 bg-darkblue-500/[0.3] rounded-lg shadow-md p-4">
+        <div className="flex justify-center space-x-2 mb-3">
+          {gifs.map((gif, index) => (
+            <button
+              key={gif.id}
+              onClick={() => goToGif(index)}
+              className={cn(
+                "w-3 h-3 rounded-full transition-all",
+                index === currentIndex
+                  ? "bg-blue-500 scale-125"
+                  : "bg-white/[0.3] hover:bg-white/[0.5]"
+              )}
+              aria-label={`View ${gif.title}`}
+            />
+          ))}
+        </div>
+        <div className="text-center">
+          <h3 className="text-xl font-bold text-white">
+            {gifs[currentIndex].title}
+          </h3>
+          <p className="text-sm text-white/75">
+            {gifs[currentIndex].description}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function HeroGeometric({
   badge = "Kokonut UI",
-  title1 = "Elevate Your",
-  title2 = "Digital Vision",
+  title1 = "Train Vision",
+  title2 = "Deploy Vision",
 }: {
-  badge?: string
-  title1?: string
-  title2?: string
+  badge?: string;
+  title1?: string;
+  title2?: string;
 }) {
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -97,97 +194,95 @@ export default function HeroGeometric({
         ease: [0.25, 0.4, 0.25, 1],
       },
     }),
-  }
+  };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#030303]">
-      <div className="absolute inset-0 bg-linear-to-br from-indigo-500/[0.05] via-transparent to-rose-500/[0.05] blur-3xl" />
+    <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.05] via-transparent to-darkblue-500/[0.05] blur-3xl" />
 
       <div className="absolute inset-0 overflow-hidden">
         <ElegantShape
           delay={0.3}
           width={600}
-          height={140}
+          height={150}
           rotate={12}
-          gradient="from-indigo-500/[0.15]"
-          className="left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]"
+          gradient="from-blue-500/[0.15]"
+          className="left-[-10%] md:left-[-5%] top-[10%] md:top-[15%]"
         />
-
         <ElegantShape
           delay={0.5}
           width={500}
           height={120}
           rotate={-15}
-          gradient="from-rose-500/[0.15]"
-          className="right-[-5%] md:right-[0%] top-[70%] md:top-[75%]"
+          gradient="from-darkblue-500/[0.15]"
+          className="right-[-5%] md:right-[0%] top-[65%] md:top-[70%]"
         />
-
         <ElegantShape
           delay={0.4}
-          width={300}
-          height={80}
+          width={400}
+          height={100}
           rotate={-8}
-          gradient="from-violet-500/[0.15]"
+          gradient="from-blue-500/[0.15]"
           className="left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
         />
-
         <ElegantShape
           delay={0.6}
-          width={200}
-          height={60}
+          width={350}
+          height={90}
           rotate={20}
-          gradient="from-amber-500/[0.15]"
-          className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
+          gradient="from-darkblue-500/[0.15]"
+          className="right-[10%] md:right-[15%] top-[5%] md:top-[10%]"
         />
-
         <ElegantShape
           delay={0.7}
-          width={150}
-          height={40}
+          width={300}
+          height={80}
           rotate={-25}
-          gradient="from-cyan-500/[0.15]"
-          className="left-[20%] md:left-[25%] top-[5%] md:top-[10%]"
+          gradient="from-blue-500/[0.15]"
+          className="left-[15%] md:left-[20%] top-[5%] md:top-[10%]"
         />
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 md:px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <motion.div
-            custom={0}
-            variants={fadeUpVariants}
-            initial="hidden"
-            animate="visible"
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 md:mb-12"
-          >
-            <Image src="https://kokonutui.com/logo.svg" alt="Kokonut UI" width={20} height={20} />
-            <span className="text-sm text-white/60 tracking-wide">{badge}</span>
-          </motion.div>
+      <div className="relative z-10 container mx-auto py-20 px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          <div className="space-y-8 text-center lg:text-left">
+            <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold mb-6 tracking-tight leading-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-500 via-darkblue-500 to-white">
+                  {title1}
+                </span>
+                <br />
+                <span
+                  className={cn(
+                    "bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-darkblue-500 to-white",
+                    "pr-5",
+                    pacifico.className
+                  )}
+                >
+                  {title2}
+                </span>
+              </h1>
+            </motion.div>
+            <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
+              <p className="text-lg sm:text-l text-darkblue-500/75 text-opacity-75 leading-relaxed font-light tracking-wide max-w-2xl mx-auto lg:mx-0">
+                Build, train, and deploy computer vision models using your own GPU. Perfect for teams that need data privacy and cost-effective solutions.
+              </p>
+            </motion.div>
+            <motion.div custom={3} variants={fadeUpVariants} initial="hidden" animate="visible">
+              <SignUpButton>
+                <button className="mt-6 px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition flex items-center gap-3 text-lg">
+                  Get Started
+                  <ArrowRight className="w-6 h-6" />
+                </button>
+              </SignUpButton>
+            </motion.div>
+          </div>
 
-          <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
-            <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">{title1}</span>
-              <br />
-              <span
-                className={cn(
-                  "bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-white/90 to-rose-300",
-                  pacifico.className,
-                )}
-              >
-                {title2}
-              </span>
-            </h1>
-          </motion.div>
-
-          <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
-            <p className="text-base sm:text-lg md:text-xl text-white/40 mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">
-              Crafting exceptional digital experiences through innovative design and cutting-edge technology.
-            </p>
-          </motion.div>
+          {/* Replace the image box with the GIF carousel */}
+          <GifCarousel />
         </div>
       </div>
-
-      <div className="absolute inset-0 bg-linear-to-t from-[#030303] via-transparent to-[#030303]/80 pointer-events-none" />
-    </div>
-  )
+    </section>
+  );
 }
 

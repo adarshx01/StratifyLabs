@@ -1,110 +1,132 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ChevronDown, Menu, Play } from "lucide-react"
+import { ChevronDown, Menu, Play, MessageSquare, Code, Box, Shield, Database, Layers, ArrowRight } from "lucide-react"
 import HeroGeometric from "@/components/hero-geometric"
+import { SignUpButton } from "@clerk/nextjs"; // Importing SignUpButton from Clerk
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
 
-      <HeroGeometric/>
-      {/* Hero Section with 3D Visualization */}
-      <section className="pt-32 pb-24 px-4 bg-gradient-to-b from-gray-900 to-gray-950">
-        <div className="container mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6">
-                Train Computer Vision Models Using Your Local Hardware
-              </h1>
-              <p className="text-xl text-gray-300 mb-8">
-                Build, train, and deploy computer vision models using your own GPU. Perfect for teams that need data
-                privacy and cost-effective solutions.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700">
-                  <Link href="/get-started">Get Started</Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="border-gray-700 text-white hover:bg-gray-800">
-                  <Link href="/demo">Request a Demo</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="relative h-[400px] rounded-lg overflow-hidden shadow-2xl">
-              <Image
-                src="/placeholder.svg?height=800&width=600"
-                alt="AI Model Training Visualization"
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 to-transparent" />
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroGeometric />
 
-      {/* Demo Video Section */}
-      <section className="py-24 px-4 bg-gray-900">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">See it in Action</h2>
-            <p className="text-xl text-gray-300">Watch how easy it is to train and deploy your models</p>
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-gray-950 border-b border-gray-800"> {/* Added border-b */}
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Comprehensive Vision Training</h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Supporting classification, detection, and segmentation tasks with popular models like YOLO, ResNet, UNet,
+              and more.
+            </p>
           </div>
-          <div className="relative max-w-4xl mx-auto">
-            <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Button size="lg" variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-gray-700">
-                  <Play className="h-6 w-6 mr-2" />
-                  Watch Demo
-                </Button>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Feature Card 1 */}
+            <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <MessageSquare className="h-10 w-10 text-blue-500" />
               </div>
-              <Image
-                src="/placeholder.svg?height=1080&width=1920"
-                alt="Product Demo Video Thumbnail"
-                width={1920}
-                height={1080}
-                className="object-cover opacity-50"
-              />
+              <h3 className="text-xl font-bold mb-2">Real-time Collaboration</h3>
+              <p className="text-gray-300">
+                RAG-powered messaging system for seamless team collaboration and knowledge sharing.
+              </p>
+            </div>
+
+            {/* Feature Card 2 */}
+            <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <Code className="h-10 w-10 text-blue-500" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Code Customization</h3>
+              <p className="text-gray-300">
+                Direct access to code and model customization for complete control over your projects.
+              </p>
+            </div>
+
+            {/* Feature Card 3 */}
+            <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <Box className="h-10 w-10 text-blue-500" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">3D Visualization</h3>
+              <p className="text-gray-300">
+                Web-based 3D robot visualization using URDF and Three.js for intuitive model testing.
+              </p>
+            </div>
+
+            {/* Feature Card 4 */}
+            <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <Shield className="h-10 w-10 text-blue-500" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Secure Authentication</h3>
+              <p className="text-gray-300">
+                Clerk-based authentication system ensuring your data and models remain protected.
+              </p>
+            </div>
+
+            {/* Feature Card 5 */}
+            <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <Database className="h-10 w-10 text-blue-500" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Reliable Storage</h3>
+              <p className="text-gray-300">
+                Secure storage via Supabase for datasets, models, and project configurations.
+              </p>
+            </div>
+
+            {/* Feature Card 6 */}
+            <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <Layers className="h-10 w-10 text-blue-500" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Flexible Deployment</h3>
+              <p className="text-gray-300">
+                Deploy models on cloud or edge using containerized environments for maximum flexibility.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Use Cases Grid */}
-      <section className="py-24 px-4 bg-gray-950">
+      <section className="py-24 px-4 bg-gray-900 border-b border-gray-800"> {/* Changed background and added border */}
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Real-World Applications</h2>
+          <h2 className="text-3xl font-bold text-center text-white mb-12">Real-World Applications</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
                 title: "Manufacturing QA",
-                image: "/placeholder.svg?height=400&width=600",
+                image: "/images/UseCase/manufacture.webp",
                 description: "Detect defects and ensure quality control in real-time",
               },
               {
                 title: "Retail Analytics",
-                image: "/placeholder.svg?height=400&width=600",
+                image: "/images/UseCase/retail.webp",
                 description: "Track customer behavior and optimize store layouts",
               },
               {
                 title: "Security Systems",
-                image: "/placeholder.svg?height=400&width=600",
+                image: "/images/UseCase/security.webp",
                 description: "Monitor and analyze security camera feeds",
               },
               {
-                title: "Medical Imaging",
-                image: "/placeholder.svg?height=400&width=600",
-                description: "Assist in diagnosis and medical image analysis",
+                title: "PPE Compliance Monitoring",
+                image: "/images/UseCase/healthcare.webp",
+                description: "Automatically detect face masks, gloves, and protective gear in healthcare settings to ensure safety and compliance.",
+
               },
               {
                 title: "Agriculture",
-                image: "/placeholder.svg?height=400&width=600",
+                image: "/images/UseCase/agriculture.webp",
                 description: "Monitor crop health and optimize farming operations",
               },
               {
                 title: "Smart Cities",
-                image: "/placeholder.svg?height=400&width=600",
+                image: "/images/UseCase/government.webp",
                 description: "Improve traffic flow and urban planning",
               },
             ].map((useCase, index) => (
@@ -116,10 +138,10 @@ export default function LandingPage() {
                   height={400}
                   className="object-cover w-full h-64 transition-transform group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-950 to-transparent opacity-80" />
                 <div className="absolute bottom-0 p-6">
                   <h3 className="text-xl font-bold text-white mb-2">{useCase.title}</h3>
-                  <p className="text-gray-200">{useCase.description}</p>
+                  <p className="text-gray-300">{useCase.description}</p>
                 </div>
               </div>
             ))}
@@ -127,45 +149,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Interactive Demo Section */}
-      <section className="py-24 px-4 bg-gray-800 text-white">
-        <div className="container mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Try Our Interactive Demo</h2>
-              <p className="text-xl text-gray-300 mb-8">
-                Upload your own images and see our computer vision models in action. No account required.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-purple-600 flex items-center justify-center">1</div>
-                  <p>Upload your image</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-purple-600 flex items-center justify-center">2</div>
-                  <p>Select your model</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-purple-600 flex items-center justify-center">3</div>
-                  <p>Get instant results</p>
-                </div>
-              </div>
-            </div>
-            <div className="relative h-[500px] rounded-lg overflow-hidden">
-              <Image
-                src="/placeholder.svg?height=1000&width=800"
-                alt="Interactive Demo Interface"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 to-transparent" />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Stats Section with Animation */}
-      <section className="py-24 px-4 bg-gray-900">
+      <section className="py-24 px-4 bg-gray-950 border-b border-gray-800"> {/* Added border */}
         <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-12">
             {[
@@ -174,7 +159,7 @@ export default function LandingPage() {
               { number: "24/7", label: "Availability", sublabel: "No internet required" },
             ].map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-5xl font-bold text-purple-400 mb-4">{stat.number}</div>
+                <div className="text-5xl font-bold text-blue-400 mb-4">{stat.number}</div>
                 <div className="text-xl font-semibold mb-2 text-white">{stat.label}</div>
                 <div className="text-gray-300">{stat.sublabel}</div>
               </div>
@@ -184,145 +169,43 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4 bg-gray-800">
+      <section className="py-16 px-4 bg-gray-900 border-b border-gray-800"> {/* Changed background and added border */}
         <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Everything you need for Computer Vision</h2>
+          <h2 className="text-3xl font-bold text-center text-white mb-12">Everything you need for Computer Vision</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Local GPU Training</h3>
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-white mb-4">Local GPU Training</h3>
               <p className="text-gray-300">
                 Train models using your own hardware for complete data privacy and control
               </p>
             </div>
-            <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Model Management</h3>
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-white mb-4">Model Management</h3>
               <p className="text-gray-300">Version control and experiment tracking built specifically for CV models</p>
             </div>
-            <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Easy Deployment</h3>
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-semibold text-white mb-4">Easy Deployment</h3>
               <p className="text-gray-300">Deploy models to production with just a few clicks</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Clients Section */}
-      <section className="py-16 px-4 bg-gray-950">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-gray-300">Trusted by leading companies</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center opacity-60">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-12 w-24 bg-gray-700 rounded animate-pulse" />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
-      <section className="py-16 px-4 bg-purple-800">
+      <section className="py-16 px-4 bg-gray-950"> {/* Kept the darker background for CTA */}
         <div className="container mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-6">Start Training Your Models Today</h2>
-          <p className="text-purple-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
             Join thousands of developers who are building the future of computer vision
           </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/get-started">Get Started for Free</Link>
-          </Button>
+          <SignUpButton>
+            <button className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg hover:from-blue-400 hover:to-blue-600 hover:shadow-xl transition-all duration-300">
+              Get Started for Free
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </SignUpButton>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 bg-gray-950">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-white font-semibold mb-4">Product</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Case Studies
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-4">Resources</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Documentation
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    API Reference
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Blog
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Contact
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Terms
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-white">
-                    Security
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} VisionFlow. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
