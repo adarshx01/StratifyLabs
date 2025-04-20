@@ -120,16 +120,20 @@ const WebcamFeed = forwardRef<{triggerLoadModel: () => void}, WebcamFeedProps>((
       const taskToUse = localSelectedTask || selectedTask || "classification";
       const modelToUse = localSelectedModel || selectedModel || "resnet";
       
+      // Ensure num_classes is properly parsed as an integer
+      const numClassesValue = numClasses ? parseInt(numClasses) : undefined;
+      
       const payload = {
         task_type: taskToUse,
         model_name: modelToUse,
-        model_path: modelPath || undefined,
-        dataset_path: datasetPath || undefined,
-        num_classes: numClasses ? parseInt(numClasses) : undefined
+        model_path: modelPath || null,
+        dataset_path: datasetPath || null,
+        num_classes: numClassesValue
       };
       
       console.log("Loading model with payload:", payload);
       
+      // Add proper error handling for response
       const response = await fetch(`${API_BASE_URL}/api/models/load`, {
         method: 'POST',
         headers: {
@@ -138,17 +142,22 @@ const WebcamFeed = forwardRef<{triggerLoadModel: () => void}, WebcamFeedProps>((
         body: JSON.stringify(payload),
       });
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API responded with status ${response.status}: ${errorText}`);
+      }
+      
       const data = await response.json();
       
       if (data.status === "success") {
-        showNotification(data.message, true);
+        showNotification(`Model ${modelToUse} loaded successfully`, true);
         fetchCurrentModel();
       } else {
-        showNotification(data.message, false);
+        showNotification(data.message || "Unknown error", false);
       }
     } catch (error) {
       console.error("Error loading model:", error);
-      showNotification(`Error loading model: ${error}`, false);
+      showNotification(`Error: ${error.message || "Unknown error"}`, false);
     } finally {
       setIsLoading(false);
     }
@@ -163,6 +172,15 @@ const WebcamFeed = forwardRef<{triggerLoadModel: () => void}, WebcamFeedProps>((
       setNotification(null);
     }, 5000);
   };
+
+  useEffect(() => {
+    if (isActive && currentModel && currentModel.status === "active") {
+      // If we have an active segmentation model, ensure the num_classes is set correctly
+      if (currentModel.task_type === "segmentation" && currentModel.num_classes) {
+        setNumClasses(currentModel.num_classes.toString());
+      }
+    }
+  }, [currentModel, isActive]);
 
   return (
     <div className="relative aspect-video w-full">
