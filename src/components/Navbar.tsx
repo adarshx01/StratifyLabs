@@ -43,7 +43,9 @@ const Navbar = () => {
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.4, ease: "easeInOut" }} // Smooth transition
         className={`fixed left-1/2 z-40 transform -translate-x-1/2 bg-white shadow-lg rounded-lg px-6 max-w-7xl w-[95%] ${
-          isAtTop ? "top-10 py-3" : "top-5 py-2" // Adjusted padding for smoother height change
+          isAtTop
+            ? "top-9 py-4 lg:top-12" // Add 2 units to top distance for screens > 720px
+            : "top-5 py-3 lg:top-7"   // Add 2 units to top distance for screens > 720px
         }`}
       >
         {/* Main navigation container */}
