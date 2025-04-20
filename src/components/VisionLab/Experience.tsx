@@ -112,6 +112,7 @@ const VRScene = () => {
         <URDFModel 
           urdfContent={urdfContent} 
           {...itemPlacement[classroom].urdfModel} 
+          scale={2.5}
         />
       ) : (
         <Teacher
