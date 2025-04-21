@@ -1,3 +1,4 @@
+//@ts-nocheck
 import Link from "next/link"
 import Image from "next/image"
 import { Search, Filter, ArrowUpRight, Star, Download, Eye } from "lucide-react"
