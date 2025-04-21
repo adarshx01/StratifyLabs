@@ -76,7 +76,7 @@ const Navbar = () => {
             <SignedIn>
               <UserButton />
               <Link
-                href="/visionlab"
+                href="/inference"
                 className={`${buttonVariants({ size: "sm", variant: "ghost" })} text-lg hover:bg-blue-100 hover:text-blue-500`}
               >
                 Inference

@@ -6,6 +6,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import URDFLoader from "urdf-loader";
 import { Box3, Vector3 } from "three";
 import { Html } from "@react-three/drei";
+import { useURDFJointStore } from "./URDFJointControl";
+import { useFrame } from "@react-three/fiber";
 
 // Extend THREE to include GLTFLoader
 THREE.GLTFLoader = GLTFLoader;
@@ -15,7 +17,11 @@ export function URDFModel({ urdfContent = null, position = [0, 0, 0], rotation =
   const [model, setModel] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [joints, setJoints] = useState({});
+  
+  // Access joint control store
+  const storeJoints = useURDFJointStore(state => state.joints);
+  
   useEffect(() => {
     if (!urdfContent) return;
     
@@ -35,6 +41,29 @@ export function URDFModel({ urdfContent = null, position = [0, 0, 0], rotation =
       // Try to parse the URDF content
       try {
         const result = loader.parse(urdfContent);
+        
+        // Extract joints from the model
+        const jointMap = {};
+        result.joints = result.joints || {};
+        
+        Object.keys(result.joints).forEach((jointName) => {
+          const joint = result.joints[jointName];
+          if (joint && joint.type !== 'fixed') {
+            jointMap[jointName] = joint;
+            
+            // Register joint with the store if not already registered
+            if (!storeJoints[jointName]) {
+              // Default joint limits if not specified
+              const min = joint.limit?.lower !== undefined ? joint.limit.lower : -Math.PI/2;
+              const max = joint.limit?.upper !== undefined ? joint.limit.upper : Math.PI/2;
+              
+              // Register joint - you can manually set detection class mapping later
+              useURDFJointStore.getState().registerJoint(jointName, min, max);
+            }
+          }
+        });
+        
+        setJoints(jointMap);
         
         // Center the model based on its bounding box
         const box = new Box3().setFromObject(result);
@@ -65,7 +94,25 @@ export function URDFModel({ urdfContent = null, position = [0, 0, 0], rotation =
       setLoading(false);
     }
   }, [urdfContent, position, rotation, scale]);
+  
+  // Update joints on each frame based on joint store values
+  useFrame(() => {
+    if (model && Object.keys(joints).length > 0) {
+      Object.keys(joints).forEach((jointName) => {
+        if (storeJoints[jointName]) {
+          const joint = joints[jointName];
+          const targetAngle = storeJoints[jointName].angle;
+          
+          // Apply the joint angle - you might need to adjust this based on your URDF structure
+          if (joint && joint.setAngle) {
+            joint.setAngle(targetAngle);
+          }
+        }
+      });
+    }
+  });
 
+  // Rest of your component remains the same...
   if (loading) {
     return (
       <group position={position} rotation={rotation}>

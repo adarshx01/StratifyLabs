@@ -3,12 +3,14 @@ import cv2
 import os
 import asyncio
 import numpy as np
-from fastapi import FastAPI, Query, HTTPException, Body
+from fastapi import FastAPI, Query, HTTPException, Body, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import StreamingResponse
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import argparse
 from inference_engine import InferenceEngine, TASKS
+import json
+import time
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -25,6 +27,9 @@ app.add_middleware(
 # Global variables
 inference_engine = None
 model_registry = {}  # Cache for storing loaded models
+connected_clients: List[WebSocket] = []
+latest_detection_results = []  # Store the latest detection results
+last_detection_timestamp = 0  # Timestamp of the last detection
 
 # Default paths
 DEFAULT_MODEL_BASE_PATH = "/home/adarsh/WorkSpace/VisionFlow/saved_models"
@@ -32,6 +37,8 @@ DEFAULT_DATASET_PATH = "/home/adarsh/WorkSpace/VisionFlow/facialemotion"
 
 async def generate_frames():
     """Generator for webcam frames with model inference."""
+    global latest_detection_results, last_detection_timestamp
+
     # Try different video sources
     video_sources = [0, 1, '/dev/video0', '/dev/video1']
     cap = None
@@ -62,7 +69,10 @@ async def generate_frames():
             
             # Apply model inference if a model is loaded
             if inference_engine:
-                processed_frame, _ = inference_engine.process_frame(frame)
+                processed_frame, results = inference_engine.process_frame(frame)
+                if results:
+                    latest_detection_results = results
+                    last_detection_timestamp = time.time()
             else:
                 # Show message if no model is loaded
                 processed_frame = frame.copy()
@@ -90,7 +100,10 @@ async def generate_frames():
 
             # Apply model inference if a model is loaded
             if inference_engine:
-                processed_frame, _ = inference_engine.process_frame(frame)
+                processed_frame, results = inference_engine.process_frame(frame)
+                if results:
+                    latest_detection_results = results
+                    last_detection_timestamp = time.time()
             else:
                 # Show message if no model is loaded
                 processed_frame = frame.copy()
@@ -286,6 +299,216 @@ async def get_index():
     </html>
     """
     return StreamingResponse(content=iter([html_content]), media_type="text/html")
+
+@app.get("/api/detection/latest")
+async def get_latest_detection():
+    """Get the latest detection results as JSON with simplified structure."""
+    global latest_detection_results, last_detection_timestamp
+    
+    try:
+        # If no results yet or stale results (more than 5 seconds old)
+        if not latest_detection_results or (time.time() - last_detection_timestamp > 5):
+            # Return simulated data
+            t = time.time()
+            return {
+                "status": "simulated",
+                "regions": {
+                    "topLeft": 0,
+                    "top": 0,
+                    "topRight": 0,
+                    "left": 0,
+                    "center": 1,  # Default region with activity
+                    "right": 0,
+                    "bottomLeft": 0,
+                    "bottom": 0,
+                    "bottomRight": 0
+                },
+                "primaryDetection": {
+                    "x": int(320 + 200 * np.sin(t * 0.5)),
+                    "y": int(240 + 150 * np.cos(t * 0.7)),
+                    "width": 100,
+                    "height": 100,
+                    "confidence": float(0.85 + 0.1 * np.sin(t)),
+                    "class": 0
+                }
+            }
+        
+        # Process real detection results
+        # Create a simplified structure that's easy to serialize
+        simplified_detections = []
+        regions = {
+            "topLeft": 0, "top": 0, "topRight": 0,
+            "left": 0, "center": 0, "right": 0,
+            "bottomLeft": 0, "bottom": 0, "bottomRight": 0
+        }
+        
+        primary_detection = None
+        max_confidence = -1
+        
+        # Convert raw detection results to simplified format
+        if isinstance(latest_detection_results, list):
+            for idx, detection in enumerate(latest_detection_results):
+                # Skip if no bounding box
+                if not isinstance(detection, dict) or 'bbox' not in detection:
+                    continue
+                
+                # Extract bbox coordinates
+                bbox = detection['bbox']
+                if isinstance(bbox, np.ndarray):
+                    bbox = bbox.tolist()
+                
+                # Ensure bbox is a list of 4 values
+                if not (isinstance(bbox, list) and len(bbox) >= 4):
+                    continue
+                
+                # Get coordinates
+                x1, y1, x2, y2 = [int(val) if isinstance(val, (np.integer, np.floating)) else int(val) for val in bbox[:4]]
+                
+                # Calculate center
+                center_x = (x1 + x2) // 2
+                center_y = (y1 + y2) // 2
+                width = x2 - x1
+                height = y2 - y1
+                
+                # Extract confidence
+                confidence = 0.0
+                if 'confidence' in detection:
+                    confidence = float(detection['confidence']) if isinstance(detection['confidence'], (np.floating, float)) else 0.0
+                
+                # Extract class
+                class_id = 0
+                if 'class' in detection:
+                    class_id = int(detection['class']) if isinstance(detection['class'], (np.integer, int)) else 0
+                
+                # Create clean detection object
+                clean_detection = {
+                    "x": center_x,
+                    "y": center_y,
+                    "width": width,
+                    "height": height,
+                    "confidence": confidence,
+                    "class": class_id
+                }
+                
+                # Add to simplified detections
+                simplified_detections.append(clean_detection)
+                
+                # Track detection with highest confidence as primary
+                if confidence > max_confidence:
+                    max_confidence = confidence
+                    primary_detection = clean_detection
+                
+                # Map to screen region
+                # Assuming 640x480 frame
+                # X regions: 0-213, 214-426, 427-640
+                # Y regions: 0-160, 161-320, 321-480
+                region_name = "center"  # Default
+                
+                if center_x < 213:
+                    if center_y < 160: 
+                        region_name = "topLeft"
+                    elif center_y < 320:
+                        region_name = "left"
+                    else:
+                        region_name = "bottomLeft"
+                elif center_x < 427:
+                    if center_y < 160:
+                        region_name = "top"
+                    elif center_y < 320:
+                        region_name = "center"
+                    else:
+                        region_name = "bottom"
+                else:
+                    if center_y < 160:
+                        region_name = "topRight"
+                    elif center_y < 320:
+                        region_name = "right"
+                    else:
+                        region_name = "bottomRight"
+                
+                # Increment count for this region
+                regions[region_name] += 1
+                
+        elif isinstance(latest_detection_results, dict):
+            # Handle specific dictionary format cases (like segmentation results)
+            # Just return a default region for now as segmentation results may be too complex
+            regions["center"] = 1
+            primary_detection = {
+                "x": 320,
+                "y": 240,
+                "width": 100,
+                "height": 100,
+                "confidence": 0.9,
+                "class": 0
+            }
+        
+        # If no primary detection found, create a default
+        if primary_detection is None:
+            primary_detection = {
+                "x": 320,
+                "y": 240,
+                "width": 0,
+                "height": 0,
+                "confidence": 0.0,
+                "class": 0
+            }
+        
+        # Return the simplified structure
+        return {
+            "status": "success",
+            "regions": regions,
+            "detections": simplified_detections,
+            "primaryDetection": primary_detection
+        }
+    
+    except Exception as e:
+        import traceback
+        print(f"Error in get_latest_detection: {e}")
+        traceback.print_exc()
+        
+        # Return fallback data on error
+        return {
+            "status": "error",
+            "message": str(e),
+            "regions": {
+                "topLeft": 0, "top": 0, "topRight": 0,
+                "left": 0, "center": 1, "right": 0,
+                "bottomLeft": 0, "bottom": 0, "bottomRight": 0
+            },
+            "primaryDetection": {
+                "x": 320, "y": 240, "width": 50, "height": 50, 
+                "confidence": 0.5, "class": 0
+            }
+        }
+
+@app.websocket("/api/detection/stream")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    connected_clients.append(websocket)
+    try:
+        while True:
+            # Wait for client messages
+            data = await websocket.receive_text()
+            
+            # If we have detection results, send them
+            if inference_engine and hasattr(inference_engine, 'latest_results'):
+                await websocket.send_json({
+                    "detection_results": inference_engine.latest_results
+                })
+            else:
+                await websocket.send_json({
+                    "status": "no_data"
+                })
+            
+            # Add a brief delay to avoid flooding
+            await asyncio.sleep(0.1)
+    except WebSocketDisconnect:
+        connected_clients.remove(websocket)
+        print("Client disconnected from WebSocket")
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+        if websocket in connected_clients:
+            connected_clients.remove(websocket)
 
 def init_inference_engine(task_type, model_name, model_path, dataset_path=None, num_classes=None):
     """Initialize the inference engine with the specified model."""

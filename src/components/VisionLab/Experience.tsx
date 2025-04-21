@@ -14,6 +14,7 @@ import { Leva, button, useControls } from "leva";
 import  SciFiCamera  from '@/components/TestCamera/page';
 import { URDFModel } from "./URDFModel";
 import { URDFControl, useURDFStore } from "./URDFControl";
+import { DetectionConnector } from "./DetectionConnector";
 
 const itemPlacement = {
   default: {
@@ -99,6 +100,10 @@ const VRScene = () => {
       >
         <SciFiCamera />
       </Html>
+      
+      {/* Add the DetectionConnector */}
+      <DetectionConnector />
+      
       <Environment preset="sunset" />
       <ambientLight intensity={1} color="pink" />
 
