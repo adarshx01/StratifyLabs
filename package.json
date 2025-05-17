@@ -26,6 +26,7 @@
         "@react-three/drei": "^9.120.8",
         "@react-three/fiber": "^9.1.2",
         "@react-three/xr": "^5.7.1",
+        "@supabase/supabase-js": "^2.49.4",
         "@tabler/icons-react": "^3.31.0",
         "@types/three": "^0.175.0",
         "axios": "^1.7.7",

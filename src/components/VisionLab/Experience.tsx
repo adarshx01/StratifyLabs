@@ -214,7 +214,7 @@ export const VRExperience = () => {
     <>
       <VRButton className="fixed bottom-4 right-4 z-50" />
       <div className="z-10 md:justify-center fixed bottom-4 left-4 right-4 flex gap-3 flex-wrap justify-stretch">
-        {/* <TypingBox /> */}
+        <TypingBox />
         <URDFControl />
       </div>
       <Leva hidden />
