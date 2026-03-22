@@ -1,0 +1,16 @@
+__pycache__
+StaticFiles
+db.sqlite3
+media
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.log
+*.pot
+*.mo
+*.pyc
+*.pyo
+StratifyLabs
+training/saved_models
