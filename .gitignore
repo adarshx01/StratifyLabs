@@ -14,3 +14,4 @@ media
 *.pyo
 StratifyLabs
 training/saved_models
+.venv/
